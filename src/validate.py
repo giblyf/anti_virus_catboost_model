@@ -1,15 +1,17 @@
-from train import clean_libs, read_data, feature_engineering, get_dummies
-import pandas as pd
-import numpy as np
-from warnings import simplefilter
-from catboost import CatBoostClassifier
+from train import *
 from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
 
-
 # Загрузка модели Catboost
+
 def load_model(model_name):
+    # '..' переходит на уровень выше относительно src
+    model_folder = os.path.join(CURRENT_DIR, '..', 'model')  
+
+    # Путь к файлу модели
+    model_file_path = os.path.join(model_folder, model_name)
+
     model = CatBoostClassifier()
-    model.load_model(model_name)
+    model.load_model(model_file_path)
 
     return model
 
@@ -23,8 +25,17 @@ def write_val_results(y_test, y_pred):
     recall = tp / (tp + fn)
     f1 = f1_score(y_test, y_pred)
 
+     # '..' переходит на уровень выше относительно src
+    results_folder = os.path.join(CURRENT_DIR, '..', 'results')  
+
+     # Проверка и создание папки, если она не существует
+    os.makedirs(results_folder, exist_ok=True)
+
+
+    # Путь к файлу модели
+
     print("The prediction result is saved as a file 'validation.txt'")
-    with open('validation.txt', 'w') as f:
+    with open(os.path.join(results_folder, 'validation.txt'), 'w') as f:
         f.write(f'True positive: {tp}\n')
         print(f"True positive: {tp}")
 

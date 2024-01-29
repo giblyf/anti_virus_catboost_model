@@ -1,16 +1,15 @@
-from train import clean_libs, read_data, feature_engineering, get_dummies
-from validate import load_model, predict
-from warnings import simplefilter
-import pandas as pd
-from catboost import CatBoostClassifier, Pool
+from validate import *
+from catboost import Pool
 
 
 # Функция для записи результатов предсказания в файл
 def write_test_results(y_pred):
-    with open('prediction.txt', 'w') as f:
-        f.write('prediction\n') 
+    predict_path = change_path('results')
+
+    with open(os.path.join(predict_path, 'prediction.txt'), 'w') as file:
+        file.write('prediction\n') 
         for pred in y_pred:
-            f.write(f'{pred}\n')
+            file.write(f'{pred}\n')
 
 
 # Функция, которая бъясняет предсказания модели CatBoostClassifier, 
@@ -25,8 +24,9 @@ def explain(model, test, y_pred):
     # Создание словаря, сопоставляющего каждый признак его важности
     feature_importance_dict = dict(zip(test, feature_importances))
 
+    explain_path = change_path('results')
     # Открытие файла 'explain.txt' для записи результата
-    with open('explain.txt', 'w') as file:
+    with open(os.path.join(explain_path, 'explain.txt'), 'w') as file:
         # Итерация по предсказаниям и строкам тестового набора данных
         for i, (pred, row) in enumerate(zip(y_pred, test.iterrows())):
             if pred:  # Если модель считает файл зловредным

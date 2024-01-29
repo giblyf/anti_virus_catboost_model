@@ -7,15 +7,14 @@ import os.path
 from warnings import simplefilter
 import time
 
+# Получение абсолютного пути к текущему каталогу, в котором читаем файл
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Функция для чтения файлов .tsv
 def read_data(file_name):
-    # Получение абсолютного пути к текущему каталогу, в котором читаем файл
-    # train.tsv
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-
     print("Reading train.tsv...\n")
-    data = pd.read_csv(os.path.join(current_dir, file_name), sep='\t')
+    data_folder = change_path('data')
+    data = pd.read_csv(os.path.join(data_folder, file_name), sep='\t')
 
     print('Data information:')
     data.info()
@@ -23,6 +22,18 @@ def read_data(file_name):
     print()
 
     return data
+
+
+# Переход из директрии src в папку
+def change_path(folder_name):
+    # '..' переходит на уровень выше относительно src
+    folder_path = os.path.join(CURRENT_DIR, '..', folder_name)  
+
+     # Проверка и создание папки, если она не существует
+    os.makedirs(folder_path, exist_ok=True)
+
+    return folder_path
+
 
 
 # Функция для очистки и преобразования библиотек
@@ -108,7 +119,10 @@ def train_model(df):
     print('Done training!')
     print('Save the model as "anti_virus_detector.cbm"',
           f'Train time: {train_time}', sep='\n')
-    model.save_model('anti_virus_detector.cmb', format="cbm")
+    
+    # Сохранение модели в папку
+    model_folder = change_path('model')
+    model.save_model(os.path.join(model_folder, 'anti_virus_detector.cmb'))
 
 
 if __name__ == "__main__":
